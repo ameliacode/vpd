@@ -18,22 +18,23 @@ from tqdm import tqdm
 
 from util.io import load_json, load_gz_json, decode_png
 from util.video import crop_frame
+from pathlib import Path
 
 PAD_PX = 25
 PAD_FRAC = 0.1
 PNG_COMPRESSION = [cv2.IMWRITE_PNG_COMPRESSION, 9]
 
 MASK_THRESHOLD = 0.8
-
+current_dir = Path(__file__).resolve().parents[0]
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('pose_dir', type=str)
-    parser.add_argument('video_dir', type=str)
-    parser.add_argument('-o', '--out_dir', type=str)
+    parser.add_argument('--pose_dir', type=str, default=str(current_dir / "data" / "sports" / "fs" / "pose"))
+    parser.add_argument('--video_dir', type=str, default=str(current_dir / "data" / "sports" / "fs" / "videos"))
+    parser.add_argument('-o', '--out_dir', type=str, default=str(current_dir / "data" / "sports" / "fs" / "crops"))
     parser.add_argument('-v', '--visualize', action='store_true')
     parser.add_argument('-d', '--dim', type=int, default=128)
-    parser.add_argument('--target_fps', type=int)
+    parser.add_argument('--target_fps', type=int, default=25)
     parser.add_argument('--num_prev_frames', type=int, default=1)
     parser.add_argument('--no_smooth', action='store_true')
     return parser.parse_args()
@@ -55,7 +56,6 @@ class DelayBuffer:
 
 def extract_crops(video_path, box_dict, mask_dict, out_dir, dim, target_fps,
                   num_prev_frames, smooth_boxes, visualize):
-
     vc = cv2.VideoCapture(video_path)
     n = int(vc.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = vc.get(cv2.CAP_PROP_FPS)
@@ -164,7 +164,6 @@ def main(pose_dir, video_dir, out_dir, dim, target_fps, num_prev_frames,
          no_smooth, visualize):
     video_names = [x for x in os.listdir(pose_dir)
                    if os.path.isdir(os.path.join(pose_dir, x))]
-
     box_dict = {v: load_json(os.path.join(pose_dir, v, 'boxes.json'))
                 for v in video_names}
     worker_args = [

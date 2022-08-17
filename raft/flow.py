@@ -7,8 +7,13 @@ Copy to the RAFT directory to compute optical flow on crops.
 Original: https://github.com/princeton-vl/RAFT
 """
 
-import sys
-sys.path.append('core')
+try:
+    import sys
+    from os import path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+    from raft import RAFT
+except:
+    from core.raft import RAFT
 
 import argparse
 import os
@@ -21,8 +26,6 @@ from torch.utils.data import Dataset, DataLoader
 
 from PIL import Image
 from tqdm import tqdm
-
-from raft import RAFT
 
 
 DEVICE = 'cuda'
@@ -126,7 +129,7 @@ def demo(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', help="dataset for evaluation")
+    parser.add_argument('--path', help="dataset for evaluation")
     parser.add_argument('--model', help="restore checkpoint",
                         default='models/raft-things.pth')
     parser.add_argument('--small', action='store_true', help='use small model')

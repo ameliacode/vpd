@@ -9,13 +9,15 @@ import csv
 from collections import defaultdict
 from multiprocessing import Pool
 from tqdm import tqdm
+from pathlib import Path
 
 from util.video import get_metadata, cut_segment
 
+current_dir = Path(__file__).resolve().parents[0]
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('video_dir', type=str)
-    parser.add_argument('out_dir', type=str)
+    parser.add_argument('--video_dir', type=str, default=str(current_dir / "data" / "sports" / "fs" / "videos"))
+    parser.add_argument('--out_dir', type=str,  default=str(current_dir / "data" / "sports" / "fs" / "crops"))
     parser.add_argument('--padding', type=int, default=0)
     return parser.parse_args()
 
@@ -58,7 +60,7 @@ def main(video_dir, out_dir, padding):
 
     worker_args = []
     for video_name, video_segments in segment_dict.items():
-        video_file = os.path.join(video_dir, video_name + '.mkv')
+        video_file = os.path.join(video_dir, video_name + '.mp4')
         assert os.path.isfile(video_file), video_file
 
         worker_args.append((
